@@ -1,0 +1,14 @@
+<svg width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="CareShield" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="3" y1="2" x2="33" y2="34" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#0D9488"/>
+    </linearGradient>
+  </defs>
+  <!-- Shield -->
+  <path d="M18 1.6 32 7.6v9.887c0 8.51-5.7 14.444-14 16.92C9.7 31.93 4 25.997 4 17.487V7.6L18 1.6Z" fill="url(#g)"/>
+  <!-- Vertical medical bar -->
+  <path d="M16.2 23.5V12.9h3.6v10.6h-3.6Z" fill="#fff"/>
+  <!-- Horizontal medical bar -->
+  <path d="M12.9 16.2h10.2v3.6H12.9z" fill="#fff"/>
+</svg>

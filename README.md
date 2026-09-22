@@ -1,131 +1,151 @@
-# CareShield - Digital Insurance Claims & Policies Portal
+# CareShield - Health Insurance & Claims Portal
 
-CareShield is a modern, web-based self-service insurance portal built with Spring Boot and JPA. It allows users to register, manage their insurance policies, file digital claims with uploaded documents, and track their reimbursement status. Admins can review, approve, or reject claims, which automatically updates the policy's remaining balance.
+A full-stack insurance claims management system with Spring Boot backend and React frontend.
 
----
+## Tech Stack
 
-## 🚀 Getting Started
+### Backend
+- **Spring Boot 3.3.2** with Java 17
+- **Spring Data JPA** + Hibernate
+- **H2 In-Memory Database** (dev)
+- **Maven** for build
+
+### Frontend
+- **React 18** with Vite
+- **Tailwind CSS v4** for styling
+- **React Router v6** for routing
+- **TanStack Query (React Query)** for server state
+- **React Hook Form + Zod** for forms/validation
+- **Recharts** for admin analytics
+- **Lucide React** for icons
+
+## Features
+
+### User Portal
+- **Authentication**: Email or mobile login, registration with role selection
+- **Dashboard**: Policy overview with progress bars, recent claims, stat cards
+- **Submit Claim**: 3-step wizard (Policy → Hospital Details → Documents)
+- **Track Claims**: Searchable, filterable claims table with status badges
+- **Explore Policies**: Catalog with one-click enrollment
+- **Profile Settings**: Name, mobile, address, 2FA toggle, password change
+- **Notifications**: Bell icon with unread count, dropdown, toast alerts
+
+### Admin Portal
+- **Dashboard**: Claims queue stats, pending claims action table
+- **User Management**: View all users with roles and 2FA status
+- **Policy Management**: All policies with coverage/remaining balances
+- **Claims Management**: Review/approve/reject/settle claims with remarks
+- **Reports**: Monthly claims volume (bar chart), claims by provider (pie chart)
+
+### Key Design Decisions
+- **Light healthcare SaaS theme** (slate/primary/teal palette)
+- **INR currency** formatting (₹5,00,000)
+- **CLM-YYYY-NNN** claim number format
+- **4-stage claim tracker**: Submitted → Under Review → Approved → Settled
+- **Multi-document upload** with type labels (Hospital Bill, Discharge Summary, Medical Docs, Payment Receipt)
+- **Responsive layout** with collapsible sidebar
+
+## Getting Started
 
 ### Prerequisites
-* **OS**: Windows
-* **JDK**: Microsoft OpenJDK 17 (Automated in script)
-* **Build Tool**: Maven 3.9.9 (Automated in script)
+- Java 17+ (Microsoft OpenJDK 17 recommended)
+- Maven 3.9+
+- Node.js 18+ (for frontend development)
 
-### Installation & Run
-1. Run PowerShell as administrator and setup the compiler environment:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\setup_tools.ps1
-   ```
-2. Start the local server:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\run_app.ps1
-   ```
-3. Access the portal:
-   * **URL**: [http://localhost:8080](http://localhost:8080)
+### Quick Start (Single JAR)
 
----
+```bash
+# Build frontend (outputs to backend static resources)
+cd frontend
+npm install
+npm run build
 
-## 📊 Flowchart
-
-The following flowchart shows the user and admin interaction cycle in the CareShield portal.
-
-```mermaid
-flowchart TD
-    Start([Access CareShield Portal]) --> Auth{Logged In?}
-    Auth -- No --> AuthPage[Sign In / Sign Up]
-    AuthPage --> Auth
-    Auth -- Yes --> RoleCheck{User Role?}
-    
-    %% User Flow
-    RoleCheck -- USER --> UserDashboard[User Dashboard]
-    UserDashboard --> ViewPolicies[View Active Policies]
-    UserDashboard --> FileClaim[File New Claim]
-    FileClaim --> SubmitClaim[Submit Description, Amount & Document]
-    SubmitClaim --> PendingState[Claim status: PENDING]
-    
-    %% Admin Flow
-    RoleCheck -- ADMIN --> AdminDashboard[Admin Dashboard]
-    AdminDashboard --> ReviewClaims[Review Pending Claims]
-    ReviewClaims --> ApproveReject{Approve or Reject?}
-    ApproveReject -- Approve --> ApprovedState[Claim status: APPROVED]
-    ApprovedState --> UpdateBalance[Deduct Claim Amount from Policy Remaining Balance]
-    ApproveReject -- Reject --> RejectedState[Claim status: REJECTED]
-    
-    PendingState --> ReviewClaims
-    UpdateBalance --> End([End Cycle])
-    RejectedState --> End
+# Run Spring Boot (serves React on /)
+cd ..
+mvn spring-boot:run
 ```
 
----
+App runs at **http://localhost:8080**
 
-## 🔄 Workflow
+### Development Mode
 
-1. **User Onboarding**:
-   * Users sign up via the Auth portal. The system assigns them the role of `USER` (or `ADMIN` depending on credentials).
-   
-2. **Dashboard Overview**:
-   * **Users**: View active policies, coverages, remaining balance, and historical claims.
-   * **Admins**: Monitor all users, active policies, and claim pending statistics.
+```bash
+# Terminal 1: Backend
+cd care-shield-main
+mvn spring-boot:run
 
-3. **Claim Submission**:
-   * The user selects an active policy and submits a claim specifying the provider, date of service, description, claim amount, and an attached receipt (Base64 encoded).
-
-4. **Claims Processing**:
-   * Admins evaluate claims.
-   * **Approved**: The claim amount is deducted from the associated policy's `remainingBalance`.
-   * **Rejected**: The status is updated with reviewer feedback remarks.
-
----
-
-## 🗄️ Database ER Diagram
-
-The database uses three principal entities: `User`, `Policy`, and `Claim`. Below is the entity-relationship model.
-
-```mermaid
-erDiagram
-    USER ||--o{ POLICY : owns
-    USER ||--o{ CLAIM : submits
-    
-    USER {
-        Long id PK
-        String email UK
-        String password
-        String fullName
-        String role "USER / ADMIN"
-    }
-
-    POLICY {
-        Long id PK
-        String policyNumber UK
-        String policyName
-        String policyType "Health, Dental, Vision, Life"
-        Double coverageLimit
-        Double remainingBalance
-        Double deductible
-        Double premiumAmount
-        String status "Active, Suspended, Expired"
-        Long user_id FK
-    }
-
-    CLAIM {
-        Long id PK
-        String policyNumber
-        LocalDate serviceDate
-        Double claimAmount
-        String provider
-        String description
-        String status "Pending, Under Review, Approved, Rejected"
-        String remarks
-        LocalDate submissionDate
-        String fileName
-        String fileType
-        String documentBase64
-        Long user_id FK
-    }
+# Terminal 2: Frontend (with HMR)
+cd frontend
+npm install
+npm run dev
 ```
 
----
+Frontend dev server at **http://localhost:3000** (proxies `/api` to backend)
 
-## 🛠️ Tech Stack
-* **Backend**: Java 17, Spring Boot, Spring Data JPA, H2 Database (In-Memory)
-* **Frontend**: Vanilla CSS, JavaScript (ES6+, Fetch API), Semantic HTML5
+## Demo Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| User | santhosh@email.com | password |
+| Admin | admin@example.com | password |
+
+## Project Structure
+
+```
+care-shield-main/
+├── backend/ (Spring Boot)
+│   ├── src/main/java/com/insurance/portal/
+│   │   ├── model/          # User, Policy, Claim, ClaimDocument, Notification
+│   │   ├── repository/     # Spring Data JPA repositories
+│   │   ├── controller/     # REST endpoints (PortalController)
+│   │   └── InsurancePortalApplication.java  # Seeds demo data
+│   └── src/main/resources/
+│       ├── application.properties
+│       └── static/         # React build output (copied by Vite)
+└── frontend/ (React + Vite)
+    ├── src/
+    │   ├── api/            # Axios instance + endpoints
+    │   ├── components/     # UI components (layout, ui, forms, dashboard, claims, admin)
+    │   ├── contexts/       # AuthContext, NotificationContext
+    │   ├── hooks/          # useAuth, useNotifications, useApi (React Query)
+    │   ├── pages/          # Route-level pages
+    │   ├── utils/          # currency, date, claimNumber, cn
+    │   ├── App.jsx         # Routes + ProtectedRoute
+    │   └── main.jsx        # Entry (QueryClient, BrowserRouter, Providers)
+    ├── index.html
+    ├── vite.config.js      # Outputs to ../backend/src/main/resources/static
+    └── tailwind.config.js  # Custom theme
+```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | Login (email OR mobile) |
+| POST | `/api/auth/register` | Register new user |
+| GET | `/api/policies?userId={id}` | User's policies |
+| POST | `/api/policies/purchase` | Enroll in policy |
+| GET | `/api/claims?userId={id}` | User's claims |
+| POST | `/api/claims` | Submit claim (multipart) |
+| GET | `/api/claims/track/{claimNumber}` | Track by claim number |
+| GET | `/api/claims/{id}/documents` | Claim document metadata |
+| PUT | `/api/claims/{id}/status` | Update claim status (admin) |
+| GET | `/api/notifications?userId={id}` | User notifications |
+| PUT | `/api/notifications/{id}/read` | Mark notification read |
+| GET | `/api/admin/stats` | Admin dashboard stats |
+| GET | `/api/admin/users` | All users |
+| GET | `/api/admin/policies` | All policies |
+| GET | `/api/admin/claims` | All claims |
+| GET | `/api/admin/reports` | Analytics data |
+
+## Database Schema
+
+- **users**: id, email, password, full_name, role, mobile, address, two_factor_enabled
+- **policies**: id, policy_number, policy_name, policy_type, coverage_limit, remaining_balance, deductible, premium_amount, status, start_date, end_date, user_id
+- **claims**: id, claim_number, policy_number, claim_type, provider, hospital_address, admission_date, discharge_date, service_date, claim_amount, description, status, remarks, submission_date, user_id
+- **claim_documents**: id, claim_id, document_type, file_name, file_type, document_base64
+- **notifications**: id, user_id, message, type, is_read, created_at
+
+## License
+
+MIT
