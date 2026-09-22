@@ -1,6 +1,7 @@
 package com.insurance.portal.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "policies")
@@ -32,6 +33,12 @@ public class Policy {
 
     @Column(nullable = false) // Active, Suspended, Expired
     private String status;
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -107,6 +114,22 @@ public class Policy {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public User getUser() {

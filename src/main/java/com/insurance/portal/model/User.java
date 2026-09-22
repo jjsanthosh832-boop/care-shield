@@ -1,8 +1,9 @@
 package com.insurance.portal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -14,7 +15,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String password;
 
@@ -23,6 +24,14 @@ public class User {
 
     @Column(nullable = false) // "USER" or "ADMIN"
     private String role;
+
+    @Column(unique = true)
+    private String mobile;
+
+    private String address;
+
+    @Column(name = "two_factor_enabled")
+    private boolean twoFactorEnabled = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -70,6 +79,30 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public boolean isTwoFactorEnabled() {
+        return twoFactorEnabled;
+    }
+
+    public void setTwoFactorEnabled(boolean twoFactorEnabled) {
+        this.twoFactorEnabled = twoFactorEnabled;
     }
 
     public List<Policy> getPolicies() {
