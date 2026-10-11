@@ -14,6 +14,7 @@ import { AdminPoliciesPage } from './pages/admin/AdminPoliciesPage';
 import { AdminClaimsPage } from './pages/admin/AdminClaimsPage';
 import { AdminReportsPage } from './pages/admin/AdminReportsPage';
 import { useAuth } from './hooks/useAuth';
+import { Toaster } from './components/ui/Toaster';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -52,5 +53,10 @@ function AppRoutes() {
 }
 
 export default function App() {
-  return <AppRoutes />;
+  return (
+    <>
+      <AppRoutes />
+      <Toaster />
+    </>
+  );
 }

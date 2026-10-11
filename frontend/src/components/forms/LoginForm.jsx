@@ -30,10 +30,14 @@ export function LoginForm() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      await login(data);
-      navigate('/dashboard', { replace: true });
-    } catch {
-      // Error handled by mutation
+      const userData = await login(data);
+      showToast(`Welcome back, ${userData?.fullName?.split(' ')[0] || 'User'}!`, 'success');
+      navigate(userData?.role === 'ADMIN' ? '/admin' : '/dashboard', { replace: true });
+    } catch (error) {
+      const message = error?.code === 'ECONNABORTED'
+        ? 'Server is taking too long to respond. Please check your connection and try again.'
+        : (error?.response?.data?.message || 'Login failed. Please try again.');
+      showToast(message, 'error');
     } finally {
       setIsLoading(false);
     }

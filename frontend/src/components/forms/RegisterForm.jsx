@@ -46,8 +46,11 @@ export function RegisterForm() {
       });
       showToast('Account created successfully! Please sign in.', 'success');
       navigate('/login', { replace: true });
-    } catch {
-      // Error handled by mutation
+    } catch (error) {
+      const message = error?.code === 'ECONNABORTED'
+        ? 'Server is taking too long to respond. Please check your connection and try again.'
+        : (error?.response?.data?.message || 'Registration failed. Please try again.');
+      showToast(message, 'error');
     } finally {
       setIsLoading(false);
     }
